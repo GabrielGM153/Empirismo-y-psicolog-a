@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Empirismo y La Psicología Científica</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind Config for Custom Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'paper': '#fdfbf7',
+                        'paper-dark': '#f3f0e8',
+                        'ink': '#2d3748',
+                        'accent': '#c05621', // Amber/Orange-ish
+                        'secondary': '#2c5282', // Muted Blue
+                        'highlight': '#f6e05e'
+                    },
+                    fontFamily: {
+                        'serif': ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
+                        'sans': ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles for Chart Containers */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 500px;
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Hide scrollbar for clean horizontal scroll */
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Interactive Element Styles */
+        .step-active {
+            background-color: #2c5282;
+            color: white;
+            border-color: #2c5282;
+        }
+        .step-inactive {
+            background-color: white;
+            color: #718096;
+            border-color: #cbd5e0;
+        }
+        .step-inactive:hover {
+            border-color: #2c5282;
+            color: #2c5282;
+        }
+        
+        .tab-active {
+            border-bottom: 2px solid #c05621;
+            color: #2d3748;
+            font-weight: bold;
+        }
+        .tab-inactive {
+            border-bottom: 2px solid transparent;
+            color: #718096;
+        }
+        .tab-inactive:hover {
+            color: #c05621;
+        }
+    </style>
+
+    <!-- Chosen Palette: Warm Academia (Paper backgrounds, Ink text, Amber & Navy accents) -->
+    <!-- Application Structure Plan: 
+         1. Hero: Title and Abstract.
+         2. Foundations: Interactive Timeline cards for historical context.
+         3. Methodology: Interactive Stepper for the Scientific Method (Cycle).
+         4. Theory: Textual analysis with highlighting.
+         5. Analysis: Interactive Radar Chart comparing Empiricism vs Introspection.
+         This structure moves from history (context) to process (how) to critique (evaluation), aiding understanding.
+    -->
+    <!-- Visualization & Content Choices:
+         - Historical Timeline -> Horizontal Scroll Cards -> To show progression efficiently without long text blocks.
+         - Scientific Method -> Interactive Stepper -> To emphasize the distinct yet connected nature of the steps.
+         - Strengths/Limits -> Radar Chart (Chart.js) -> To visualize the multidimensional trade-offs (e.g., Objectivity vs. Depth).
+         - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+</head>
+<body class="bg-paper text-ink font-sans antialiased leading-relaxed">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-paper/95 backdrop-blur shadow-sm border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-serif font-bold text-secondary">Ψ Por Gabriel González Méndez</span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <button onclick="scrollToSection('hero')" class="hover:text-accent transition">Inicio</button>
+                    <button onclick="scrollToSection('origenes')" class="hover:text-accent transition">Orígenes</button>
+                    <button onclick="scrollToSection('metodo')" class="hover:text-accent transition">El Método</button>
+                    <button onclick="scrollToSection('analisis')" class="hover:text-accent transition">Análisis Crítico</button>
+                </div>
+                <!-- Mobile Menu Button (simplified functionality for single file) -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-gray-600 hover:text-accent focus:outline-none">
+                        ☰
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <div class="flex flex-col space-y-2">
+                    <button onclick="scrollToSection('hero')" class="pl-2 py-1 hover:text-accent text-left">Inicio</button>
+                    <button onclick="scrollToSection('origenes')" class="pl-2 py-1 hover:text-accent text-left">Orígenes</button>
+                    <button onclick="scrollToSection('metodo')" class="pl-2 py-1 hover:text-accent text-left">El Método</button>
+                    <button onclick="scrollToSection('analisis')" class="pl-2 py-1 hover:text-accent text-left">Análisis Crítico</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-24">
+
+        <!-- HERO SECTION -->
+        <section id="hero" class="text-center pt-10 pb-6 border-b border-gray-200">
+            <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-accent uppercase bg-orange-100 rounded-full">
+                Psicología Aplicada: Psicología Clínica UNAM - Facultad de estudios Superiores Iztacala
+            </div>
+            <h1 class="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-6">
+                La Influencia del Empirismo en la Psicología Científica
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-600 font-serif italic">
+                Un análisis riguroso sobre cómo la observación sistemática transformó el estudio de la mente en una disciplina objetiva.
+            </p>
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-left text-sm bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <div>
+                    <strong class="block text-secondary mb-1">El Pilar Empírico</strong>
+                    <p>El conocimiento se deriva de la experiencia sensorial, rechazando las ideas innatas como fuente primaria de verdad.</p>
+                </div>
+                <div>
+                    <strong class="block text-secondary mb-1">El Método</strong>
+                    <p>La adopción de protocolos rigurosos de observación y experimentación para validar hipótesis psicológicas.</p>
+                </div>
+                <div>
+                    <strong class="block text-secondary mb-1">El Balance</strong>
+                    <p>Las fortalezas de la objetividad frente a las limitaciones de reducir la experiencia humana a datos medibles.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 1: ORIGINS & FOUNDATIONS (Timeline) -->
+        <section id="origenes">
+            <div class="mb-8">
+                <h2 class="text-3xl font-serif font-bold text-gray-900 mb-4">1. Empirismo y Psicología: El Puente Histórico</h2>
+                <p class="text-gray-700 mb-6 leading-relaxed">
+                    La psicología no nació en un vacío. Su emergencia como ciencia es el resultado directo de la aplicación de los principios filosóficos del <strong>empirismo</strong> al estudio de la mente. Figuras como John Locke y David Hume sentaron las bases al proponer que la mente es una "tabula rasa" que se llena a través de la experiencia.
+                </p>
+                <div class="bg-blue-50 border-l-4 border-secondary p-4 mb-8">
+                    <p class="text-sm text-blue-900">
+                        <strong>Insight Clave:</strong> El empirismo desafió el racionalismo (Descartes), moviendo el foco de la "razón pura" a la "evidencia observable". Esto fue el requisito previo indispensable para el laboratorio experimental.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Interactive Timeline/Cards -->
+            <div class="relative">
+                <div class="flex space-x-6 overflow-x-auto hide-scroll pb-8" id="timeline-container">
+                    <!-- Cards injected by JS -->
+                </div>
+                <!-- Fade effect on right -->
+                <div class="absolute right-0 top-0 bottom-8 w-12 bg-gradient-to-l from-paper to-transparent pointer-events-none md:hidden"></div>
+                <div class="text-center text-xs text-gray-400 md:hidden">Desliza para ver más →</div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: THE SCIENTIFIC METHOD (Interactive Process) -->
+        <section id="metodo" class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+            <div class="max-w-3xl mx-auto text-center mb-10">
+                <h2 class="text-3xl font-serif font-bold text-gray-900 mb-4">2. El Método Científico en Psicología</h2>
+                <p class="text-gray-600">
+                    La psicología científica se define no por <em>qué</em> estudia, sino por <em>cómo</em> lo estudia. El método científico es el estándar de oro que legitima a la psicología como ciencia, proporcionando un ciclo recursivo de validación.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Navigation Steps (Left Col) -->
+                <div class="lg:col-span-4 flex flex-col space-y-3">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-2">Ciclo de Investigación</h3>
+                    <button onclick="updateMethodStep(0)" id="step-btn-0" class="method-btn text-left px-4 py-3 rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none">
+                        <span class="font-bold block">I. Observación</span>
+                        <span class="text-xs">Definición del problema</span>
+                    </button>
+                    <button onclick="updateMethodStep(1)" id="step-btn-1" class="method-btn text-left px-4 py-3 rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none">
+                        <span class="font-bold block">II. Teoría & Hipótesis</span>
+                        <span class="text-xs">Predicción contrastable</span>
+                    </button>
+                    <button onclick="updateMethodStep(2)" id="step-btn-2" class="method-btn text-left px-4 py-3 rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none">
+                        <span class="font-bold block">III. Método & Recolección</span>
+                        <span class="text-xs">Diseño experimental</span>
+                    </button>
+                    <button onclick="updateMethodStep(3)" id="step-btn-3" class="method-btn text-left px-4 py-3 rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none">
+                        <span class="font-bold block">IV. Análisis de Datos</span>
+                        <span class="text-xs">Estadística inferencial</span>
+                    </button>
+                    <button onclick="updateMethodStep(4)" id="step-btn-4" class="method-btn text-left px-4 py-3 rounded-lg border transition-all duration-200 hover:shadow-md focus:outline-none">
+                        <span class="font-bold block">V. Comunicación</span>
+                        <span class="text-xs">Replicabilidad y Revisión</span>
+                    </button>
+                </div>
+
+                <!-- Content Display (Right Col) -->
+                <div class="lg:col-span-8 bg-paper-dark rounded-xl p-8 border border-gray-200 flex flex-col justify-center min-h-[300px]">
+                    <div id="method-content" class="transition-opacity duration-300">
+                        <!-- Content injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: IMPORTANCE OF THEORY -->
+        <section id="teoria">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-serif font-bold text-gray-900 mb-6">3. La Importancia de la Teoría</h2>
+                    <p class="text-gray-700 mb-4 leading-relaxed">
+                        En la ciencia psicológica, los datos sin teoría son ciegos, y la teoría sin datos es vacía. Una **teoría** no es una simple suposición, sino un sistema lógico-deductivo constituido por un conjunto de hipótesis comprobadas.
+                    </p>
+                    <ul class="space-y-4 mt-6">
+                        <li class="flex items-start">
+                            <span class="text-accent text-xl mr-3">✦</span>
+                            <span class="text-sm text-gray-600"><strong>Marco Organizador:</strong> La teoría organiza hechos aislados en un todo coherente, permitiendo entender fenómenos complejos (ej. Teoría del Apego).</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-accent text-xl mr-3">✦</span>
+                            <span class="text-sm text-gray-600"><strong>Generador de Hipótesis:</strong> Las teorías fructíferas generan nuevas preguntas de investigación, impulsando el avance del conocimiento.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-accent text-xl mr-3">✦</span>
+                            <span class="text-sm text-gray-600"><strong>Predicción:</strong> Permite anticipar comportamientos futuros bajo ciertas condiciones, crucial para la aplicación clínica y social.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 transform rotate-1 hover:rotate-0 transition duration-500">
+                    <h4 class="text-center font-bold text-secondary mb-4 border-b pb-2">El Ciclo Inductivo-Deductivo</h4>
+                    <div class="space-y-4 text-center">
+                        <div class="p-3 bg-blue-50 rounded text-blue-900 font-semibold">Teoría General</div>
+                        <div class="text-2xl text-gray-400">↓ Deducción</div>
+                        <div class="p-3 bg-orange-50 rounded text-orange-900 font-semibold">Hipótesis Específicas</div>
+                        <div class="text-2xl text-gray-400">↓ Prueba Empírica</div>
+                        <div class="p-3 bg-green-50 rounded text-green-900 font-semibold">Datos / Observación</div>
+                        <div class="text-2xl text-gray-400">↑ Inducción</div>
+                        <div class="p-3 bg-gray-50 rounded text-gray-600 text-sm italic">Revisión de la Teoría</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: STRENGTHS & LIMITATIONS (Radar Chart) -->
+        <section id="analisis" class="border-t border-gray-200 pt-16">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-serif font-bold text-gray-900 mb-4">4. Fortalezas y Limitaciones del Empirismo</h2>
+                <p class="max-w-2xl mx-auto text-gray-600">
+                    Si bien el enfoque empírico otorgó estatus científico a la psicología, no está exento de críticas. A continuación, visualizamos el perfil de una investigación estrictamente empírica comparada con enfoques más cualitativos/fenomenológicos.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                <!-- Text Analysis -->
+                <div class="space-y-6">
+                    <!-- Tabs -->
+                    <div class="flex border-b border-gray-200 mb-4">
+                        <button onclick="toggleAnalysisTab('fortalezas')" id="tab-fortalezas" class="tab-active px-4 py-2 text-sm font-medium focus:outline-none transition">Fortalezas</button>
+                        <button onclick="toggleAnalysisTab('limitaciones')" id="tab-limitaciones" class="tab-inactive px-4 py-2 text-sm font-medium focus:outline-none transition">Limitaciones</button>
+                    </div>
+
+                    <!-- Content Area -->
+                    <div id="analysis-content-area" class="min-h-[200px]">
+                        <!-- Content injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Radar Chart -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col items-center">
+                    <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Perfil Comparativo</h3>
+                    <div class="chart-container">
+                        <canvas id="empiricismRadarChart"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-4 text-center italic">
+                        Gráfico: Comparación dimensional entre el Enfoque Empírico-Cuantitativo y enfoques puramente Subjetivos.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="bg-secondary text-white py-12 mt-12 rounded-t-lg">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <h3 class="text-xl font-serif font-bold mb-4">Conclusión</h3>
+                <p class="mb-8 opacity-90 leading-relaxed">
+                    La psicología científica contemporánea, heredera del empirismo, ha consolidado su rigor metodológico al integrar modelos cuantitativos sin perder de vista la complejidad subjetiva del ser humano. Esta madurez le permite dialogar con disciplinas como la ciencia de datos, donde el análisis estadístico y el aprendizaje automático enriquecen la comprensión de patrones conductuales y cognitivos (Gomez & Alvarez Sobrado, 2023).
+El vínculo entre psicología e inteligencia artificial se remonta a la máquina de Turing, concebida en 1936 como modelo de computación universal. Turing planteó que procesos mentales podrían ser simulados por algoritmos, anticipando el desarrollo de redes neuronales artificiales que hoy permiten modelar emociones, decisiones y aprendizaje desde datos (Turing, 1950; Benítez Rojas, 2024).
+Actualmente, la psicología se integra activamente en entornos de ciencia de datos, aplicando técnicas como clustering, regresión y análisis de sentimientos para generar conocimiento aplicado en salud mental, educación y marketing. Esta sinergia redefine el papel del psicólogo como analista crítico en un mundo en donde ahora es necesario un análisis algorítmico (Durán San Juan, 2024).
+ 
+                </p>
+                <div class="text-xs opacity-50 border-t border-blue-800 pt-4">
+                    Gabriel González M - Científico de Datos y Desarrollador Web, 2026.
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- DATA ---
+        
+        const timelineData = [
+            {
+                year: "s. XVII",
+                title: "John Locke",
+                desc: "Postula la 'Tabula Rasa'. La mente nace en blanco y todo conocimiento proviene de la experiencia sensorial. Rechazo de ideas innatas.",
+                icon: "📜"
+            },
+            {
+                year: "s. XVIII",
+                title: "David Hume",
+                desc: "Establece las leyes de asociación de ideas. Distingue entre impresiones (vividas) e ideas (copias débiles). El escepticismo impulsa la observación.",
+                icon: "🔗"
+            },
+            {
+                year: "s. XIX",
+                title: "Gustav Fechner",
+                desc: "Psicofísica. Demuestra que existe una relación matemática cuantificable entre la magnitud del estímulo físico y la sensación subjetiva.",
+                icon: "⚖️"
+            },
+            {
+                year: "1879",
+                title: "Wilhelm Wundt",
+                desc: "Funda el primer laboratorio de psicología experimental en Leipzig. Nace formalmente la psicología como ciencia separada de la filosofía.",
+                icon: "🏛️"
+            },
+            {
+                year: "s. XX",
+                title: "Conductismo",
+                desc: "Watson y Skinner llevan el empirismo al extremo: solo la conducta observable es objeto de estudio. La 'caja negra' mental se ignora.",
+                icon: "🐀"
+            }
+        ];
+
+        const methodSteps = [
+            {
+                title: "I. Observación y Definición",
+                content: "Todo comienza con la curiosidad ante un fenómeno. En esta fase, el investigador identifica un problema o patrón de comportamiento. <strong>Ejemplo:</strong> Observar que los estudiantes parecen rendir menos en exámenes cuando tienen altos niveles de ansiedad.",
+                color: "border-l-4 border-blue-500"
+            },
+            {
+                title: "II. Formulación de Hipótesis",
+                content: "Se crea una explicación tentativa y comprobable. Debe ser falsable. <strong>Ejemplo:</strong> 'Existe una correlación negativa entre los niveles de ansiedad reportada y el puntaje en pruebas de matemáticas.'",
+                color: "border-l-4 border-indigo-500"
+            },
+            {
+                title: "III. Método y Recolección de Datos",
+                content: "Se selecciona el diseño (experimental, correlacional, longitudinal). Se operacionalizan las variables y se recogen datos empíricos libres de sesgo. <strong>Herramientas:</strong> Tests psicométricos, registros fisiológicos, encuestas.",
+                color: "border-l-4 border-purple-500"
+            },
+            {
+                title: "IV. Análisis de Datos",
+                content: "Los datos brutos se someten a análisis estadístico para determinar si los resultados son significativos o fruto del azar. Se aceptan o rechazan las hipótesis nulas.",
+                color: "border-l-4 border-pink-500"
+            },
+            {
+                title: "V. Comunicación y Replicación",
+                content: "La ciencia es pública. Los resultados se publican en revistas revisadas por pares. Otros científicos deben poder replicar el estudio para validar universalmente los hallazgos.",
+                color: "border-l-4 border-accent"
+            }
+        ];
+
+        const analysisText = {
+            fortalezas: `
+                <ul class="space-y-4">
+                    <li class="bg-green-50 p-4 rounded-lg">
+                        <strong class="text-green-800 block mb-1">1. Objetividad y Precisión</strong>
+                        <span class="text-sm text-gray-700">El empirismo reduce el sesgo personal. Las definiciones operacionales permiten que "ansiedad" signifique lo mismo para un investigador en Chile que para uno en Japón.</span>
+                    </li>
+                    <li class="bg-green-50 p-4 rounded-lg">
+                        <strong class="text-green-800 block mb-1">2. Replicabilidad</strong>
+                        <span class="text-sm text-gray-700">Al basarse en datos observables y métodos estandarizados, otros investigadores pueden repetir el experimento para verificar la veracidad de los hallazgos.</span>
+                    </li>
+                    <li class="bg-green-50 p-4 rounded-lg">
+                        <strong class="text-green-800 block mb-1">3. Predicción y Control</strong>
+                        <span class="text-sm text-gray-700">El análisis de patrones de datos permite predecir comportamientos futuros y desarrollar intervenciones efectivas basadas en evidencia (ej. Terapias Cognitivo-Conductuales).</span>
+                    </li>
+                </ul>
+            `,
+            limitaciones: `
+                <ul class="space-y-4">
+                    <li class="bg-red-50 p-4 rounded-lg">
+                        <strong class="text-red-800 block mb-1">1. Reduccionismo</strong>
+                        <span class="text-sm text-gray-700">Al intentar medir todo numéricamente, se puede perder la riqueza y complejidad de la experiencia humana subjetiva (qualia). El amor no es solo dopamina.</span>
+                    </li>
+                    <li class="bg-red-50 p-4 rounded-lg">
+                        <strong class="text-red-800 block mb-1">2. Artificialidad</strong>
+                        <span class="text-sm text-gray-700">Muchos experimentos de laboratorio carecen de "validez ecológica". El comportamiento de una persona en un laboratorio controlado puede diferir de su conducta en la vida real.</span>
+                    </li>
+                    <li class="bg-red-50 p-4 rounded-lg">
+                        <strong class="text-red-800 block mb-1">3. El Problema de la Observación</strong>
+                        <span class="text-sm text-gray-700">En psicología, el objeto de estudio (la mente humana) es también el sujeto que estudia, lo que introduce sesgos inherentes difíciles de eliminar completamente.</span>
+                    </li>
+                </ul>
+            `
+        };
+
+        // --- INITIALIZATION & RENDERING ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTimeline();
+            updateMethodStep(0);
+            toggleAnalysisTab('fortalezas');
+            initRadarChart();
+        });
+
+        // --- TIMELINE LOGIC ---
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            let html = '';
+            timelineData.forEach(item => {
+                html += `
+                    <div class="flex-none w-72 bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col hover:shadow-md transition duration-300">
+                        <div class="text-4xl mb-4">${item.icon}</div>
+                        <div class="text-accent font-bold text-sm mb-1">${item.year}</div>
+                        <h3 class="text-xl font-serif font-bold text-gray-900 mb-2">${item.title}</h3>
+                        <p class="text-sm text-gray-600 leading-snug flex-grow">${item.desc}</p>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // --- METHOD STEPPER LOGIC ---
+        let currentStep = 0;
+
+        function updateMethodStep(index) {
+            currentStep = index;
+            
+            // Update buttons styling
+            for (let i = 0; i < 5; i++) {
+                const btn = document.getElementById(`step-btn-${i}`);
+                if (i === index) {
+                    btn.className = "method-btn text-left px-4 py-3 rounded-lg border-2 transition-all duration-200 step-active shadow-md transform scale-105";
+                } else {
+                    btn.className = "method-btn text-left px-4 py-3 rounded-lg border transition-all duration-200 step-inactive hover:bg-gray-50";
+                }
+            }
+
+            // Update Content
+            const contentDiv = document.getElementById('method-content');
+            const data = methodSteps[index];
+            
+            // Fade out, change, fade in
+            contentDiv.style.opacity = '0';
+            setTimeout(() => {
+                contentDiv.innerHTML = `
+                    <div class="bg-white p-6 rounded-lg shadow-sm ${data.color}">
+                        <h3 class="text-2xl font-serif font-bold text-gray-900 mb-4">${data.title}</h3>
+                        <p class="text-lg text-gray-700 leading-relaxed">${data.content}</p>
+                    </div>
+                `;
+                contentDiv.style.opacity = '1';
+            }, 300);
+        }
+
+        // --- ANALYSIS TABS LOGIC ---
+        function toggleAnalysisTab(tab) {
+            const contentArea = document.getElementById('analysis-content-area');
+            const btnFort = document.getElementById('tab-fortalezas');
+            const btnLim = document.getElementById('tab-limitaciones');
+
+            if (tab === 'fortalezas') {
+                btnFort.className = "tab-active px-4 py-2 text-sm font-medium focus:outline-none transition";
+                btnLim.className = "tab-inactive px-4 py-2 text-sm font-medium focus:outline-none transition";
+            } else {
+                btnFort.className = "tab-inactive px-4 py-2 text-sm font-medium focus:outline-none transition";
+                btnLim.className = "tab-active px-4 py-2 text-sm font-medium focus:outline-none transition";
+            }
+
+            contentArea.innerHTML = `<div class="animate-fade-in">${analysisText[tab]}</div>`;
+        }
+
+        // --- CHART.JS RADAR CHART ---
+        function initRadarChart() {
+            const ctx = document.getElementById('empiricismRadarChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Objetividad', 'Replicabilidad', 'Validez Ecológica', 'Profundidad Subjetiva', 'Control de Variables', 'Generalización'],
+                    datasets: [{
+                        label: 'Enfoque Empírico-Experimental',
+                        data: [95, 90, 40, 20, 95, 85],
+                        fill: true,
+                        backgroundColor: 'rgba(192, 86, 33, 0.2)', // Accent color low opacity
+                        borderColor: 'rgb(192, 86, 33)',
+                        pointBackgroundColor: 'rgb(192, 86, 33)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(192, 86, 33)'
+                    }, {
+                        label: 'Enfoque Subjetivo/Fenomenológico',
+                        data: [30, 20, 90, 95, 20, 40],
+                        fill: true,
+                        backgroundColor: 'rgba(44, 82, 130, 0.2)', // Secondary color low opacity
+                        borderColor: 'rgb(44, 82, 130)',
+                        pointBackgroundColor: 'rgb(44, 82, 130)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(44, 82, 130)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: { borderWidth: 2 }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { display: true },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: { display: false } // Hide numbers for cleaner look
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw + '/100';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- UTILS ---
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            // Close mobile menu if open
+            const menu = document.getElementById('mobile-menu');
+            if (!menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+    </script>
+</body>
+</html>
